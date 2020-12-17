@@ -1,11 +1,6 @@
 const program = require('commander')
-const low = require('lowdb')
-const FileSync = require('lowdb/adapters/FileSync')
 
-const adapter = new FileSync('db.json')
-const db = low(adapter)
-
-const {add,ls,del,done, helps} = require('./index')
+const {add,ls,del,done,helps,report} = require('./index')
 
 db.defaults({ list: []})
   .write()
@@ -37,6 +32,11 @@ program
     .command('done <index>')
     .description('marks as done')
     .action( ind => done(ind))
+
+program
+    .command('report')
+    .description('Use the report command to see the latest tally of pending and completed todos.')
+    .action(()=>report())
 
 program
     .command('help')

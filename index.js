@@ -81,13 +81,22 @@ function done(ind){
         if (fs.existsSync(path)) {
         fs.readFile( path, (error,data) => {
             if(error) throw error
-            arr = data.toString().split("\n")
-            if (ind < arr.length){
-                newarr = arr[ind-1].split(";")
-                newarr[1]="done"
-                newarr.join(";")
-                arr.splice(ind-1,1,newarr)
-                fs.writeFile(path, arr.join("\n"),(err) => {
+            newarr=[]
+            var arr = data.toString().split("\n")
+            arr.forEach((ele,index) => {
+                if(ele){
+                    if(ele.split(";")[1]==="pending"){
+                        newarr.push(ele)
+                    }
+                    
+                }
+            });
+            if (ind < newarr.length){
+                newarrr = newarr[ind-1].split(";")
+                newarrr[1]="done"
+                newarrr.join(";")
+                newarr.splice(ind-1,1,newarrr)
+                fs.writeFile(path, newarr.join("\n"),(err) => {
                     if(err) throw err
                     console.log(`Marked todo #${ind} as done.`)
                 } )
@@ -104,7 +113,36 @@ function done(ind){
 }
 
 function report(){
-    
+    let date = new Date()
+    newdate=date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
+    try {
+        if (fs.existsSync(path)) {
+        fs.readFile( path, (error, data) => {
+            if(error) throw error
+            var arr = data.toString().split("\n")
+            let pendingc=0
+            let donec=0
+            arr.forEach((ele) => {
+                if(ele){
+                    if(ele.split(";")[1]==="pending"){
+                        pendingc++
+                    }
+                    else{
+                        donec++
+                    }
+                    
+                }
+            })
+            console.log(`${newdate} Pending:${pendingc} Completed: ${donec}`)
+
+        })
+        }
+        else{
+            console.log("No pending tasks.")
+        }
+    } catch(err) {
+        console.error(err)
+    }
 }
 
 
@@ -127,5 +165,6 @@ module.exports = {
     ls,
     del,
     done,
+    report,
     helps
 }
