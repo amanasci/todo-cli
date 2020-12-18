@@ -101,42 +101,52 @@ function done(ind){
     }
 }
 
-function report(){
-    let date = new Date()
-    newdate=date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
-    var pendingcg=0
-    var donecg=0
-    try {
-        if (fs.existsSync(todopath)) {
-        fs.readFile( todopath, (error, data) => {
-            if(error) throw error
+function readtodo(){
+    
+    fs.readFile( todopath, (error, data) => {
+        let pendingcg =0
+        if(error) pendingcg =0
+        else{
             var arr = data.toString().split("\n")
             arr.forEach((ele) => {
                 if(ele){
                     pendingcg = pendingcg +1 
                 }
-            })
-        })
-        if (fs.existsSync(donepath)) {
-            fs.readFile( donepath, (error, data) => {
-                if(error) throw error
-                var arr = data.toString().split("\n")
-                arr.forEach((ele) => {
-                    if(ele){
-                        donecg ++
-                    }
-                })
-            })
+            }) 
         }
+        return pendingcg
+    })
+ }
+
+function readdone(){
+    let donecg = 0
+    fs.readFile(donepath, (error, data) => {
+        if(error) donecg =0 
         else{
-            donecg=0
+            var arr = data.toString().split("\n")
+            arr.forEach((ele) => {
+                if(ele){
+                    donecg ++
+                } 
+            })
         }
+    })
+ }
+
+
+async function report(){
+    let date = new Date()
+    newdate=date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
+    var pendingcg=0
+    var donecg=0
+    try {
+         pendingcg = await readtodo()
+         donecg = await readdone()
         console.log(`${newdate} Pending:${pendingcg} Completed: ${donecg}`)
-        }
-        else{
-            console.log("No pending tasks.")
-        }
-    } catch(err) {
+
+    } 
+    
+    catch(err) {
         console.error(err)
     }
 }
@@ -152,7 +162,7 @@ $ ./todo help             # Show usage
 $ ./todo report           # Statistics`;
     
 
-process.stdout.write(usage.toString())
+console.log(usage.toString())
 
 }
 
