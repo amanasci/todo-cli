@@ -2,10 +2,6 @@ const program = require('commander')
 
 const {add,ls,del,done,helps,report} = require('./index')
 
-db.defaults({ list: []})
-  .write()
-
-
 
 program
     .version('1.0.0')

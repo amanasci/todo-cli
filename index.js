@@ -1,17 +1,19 @@
 var fs = require("fs")
 
-const path = './todo.txt'
+const todopath = './todo.txt'
+const donepath = './done.txt'
+
 
 function add(item){
     try {
-        if (fs.existsSync(path)) {
-        fs.appendFile( path, item+";pending"+"\n", (error) => {
+        if (fs.existsSync(todopath)) {
+        fs.appendFile( todopath, item+"\n", (error) => {
             if(error) throw error
             console.log(`Added todo: \"${item}\"`)
         })
         }
         else{
-            fs.writeFile(path,"",(err)=>{
+            fs.writeFile(todopath,"",(err)=>{
                 if(err) throw err
                 add(item)
             })
@@ -23,24 +25,17 @@ function add(item){
 
 function ls() {
     try {
-        if (fs.existsSync(path)) {
-        fs.readFile( path, (error, data) => {
+        if (fs.existsSync(todopath)) {
+        fs.readFile( todopath, (error, data) => {
             if(error) throw error
-            newarr=[]
             var arr = data.toString().split("\n")
-            arr.forEach((ele,index) => {
+            arr.slice().reverse().forEach((ele,index) => {
                 if(ele){
-                    if(ele.split(";")[1]==="pending"){
-                        newarr.push(ele)
-                    }
+                    console.log(`[${arr.length - index}] ${ele}`)
                     
                 }
             });
-            newarr.slice().reverse().forEach((ele,index) =>{
-                if(ele){
-                    console.log(`[${newarr.length - index}] ${ele.split(";")[0]}`)
-                }
-            })
+            
         })
         }
         else{
@@ -54,13 +49,13 @@ function ls() {
 function del(ind){
     
     try {
-        if (fs.existsSync(path)) {
-        fs.readFile( path, (error,data) => {
+        if (fs.existsSync(todopath)) {
+        fs.readFile( todopath, (error,data) => {
             if(error) throw error
             arr = data.toString().split("\n")
             if (ind < arr.length){
                 arr.splice(ind-1, 1)
-                fs.writeFile(path, arr.join("\n"),(err) => {
+                fs.writeFile(todopath, arr.join("\n"),(err) => {
                     if(err) throw err
                     console.log(`Deleted todo #${ind}`)
                 } )
@@ -78,28 +73,22 @@ function del(ind){
 
 function done(ind){
     try {
-        if (fs.existsSync(path)) {
-        fs.readFile( path, (error,data) => {
+        if (fs.existsSync(todopath)) {
+        fs.readFile( todopath, (error,data) => {
             if(error) throw error
-            newarr=[]
-            var arr = data.toString().split("\n")
-            arr.forEach((ele,index) => {
-                if(ele){
-                    if(ele.split(";")[1]==="pending"){
-                        newarr.push(ele)
-                    }
-                    
-                }
-            });
-            if (ind < newarr.length){
-                newarrr = newarr[ind-1].split(";")
-                newarrr[1]="done"
-                newarrr.join(";")
-                newarr.splice(ind-1,1,newarrr)
-                fs.writeFile(path, newarr.join("\n"),(err) => {
+            let arr = data.toString().split("\n")
+            let item = arr[ind-1]
+            if (ind < arr.length){
+                arr.splice(ind-1,1)
+                fs.writeFile(todopath, arr.join("\n"),(err) => {
                     if(err) throw err
+                })
+                let date = new Date()
+                date = date.toISOString().split('T')[0]
+                newitem = `x ${date} ${item}`
+                fs.appendFile(donepath,newitem+"\n",(err)=>{
                     console.log(`Marked todo #${ind} as done.`)
-                } )
+                })
             }
             else{
                 console.log(`Error: todo #${ind} does not exist.`)
@@ -115,27 +104,34 @@ function done(ind){
 function report(){
     let date = new Date()
     newdate=date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
+    var pendingcg=0
+    var donecg=0
     try {
-        if (fs.existsSync(path)) {
-        fs.readFile( path, (error, data) => {
+        if (fs.existsSync(todopath)) {
+        fs.readFile( todopath, (error, data) => {
             if(error) throw error
             var arr = data.toString().split("\n")
-            let pendingc=0
-            let donec=0
             arr.forEach((ele) => {
                 if(ele){
-                    if(ele.split(";")[1]==="pending"){
-                        pendingc++
-                    }
-                    else{
-                        donec++
-                    }
-                    
+                    pendingcg = pendingcg +1 
                 }
             })
-            console.log(`${newdate} Pending:${pendingc} Completed: ${donec}`)
-
         })
+        if (fs.existsSync(donepath)) {
+            fs.readFile( donepath, (error, data) => {
+                if(error) throw error
+                var arr = data.toString().split("\n")
+                arr.forEach((ele) => {
+                    if(ele){
+                        donecg ++
+                    }
+                })
+            })
+        }
+        else{
+            donecg=0
+        }
+        console.log(`${newdate} Pending:${pendingcg} Completed: ${donecg}`)
         }
         else{
             console.log("No pending tasks.")
