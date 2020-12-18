@@ -59,7 +59,7 @@ test("add multiple todos", () => {
 
   todos.forEach((todo, i) => {
     let expected = `Added todo: "${todo}"`;
-    let received = execSync(todoTxtCli("add", `"${todo}"`)).toString("utf8");
+    let received = execSync(todoTxtCli("add", `"${todo}"`)).toString("utf-8");
 
     expect(received).toEqual(expect.stringContaining(expected));
   });

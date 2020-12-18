@@ -1,7 +1,7 @@
 var fs = require("fs")
 
-const todopath = './todo.txt'
-const donepath = './done.txt'
+const todopath = `${__dirname}/todo.txt`
+const donepath = `${__dirname}/done.txt`
 
 
 function add(item){
@@ -29,6 +29,9 @@ function ls() {
         fs.readFile( todopath, (error, data) => {
             if(error) throw error
             var arr = data.toString().split("\n")
+            if(arr.length===1){
+                console.log("There are no pending todos!")
+            }
             arr.slice().reverse().forEach((ele,index) => {
                 if(ele){
                     console.log(`[${arr.length - index}] ${ele}`)
@@ -39,7 +42,7 @@ function ls() {
         })
         }
         else{
-            console.log("No pending tasks.")
+            console.log("There are no pending todos!")
         }
     } catch(err) {
         console.error(err)
@@ -61,7 +64,7 @@ function del(ind){
                 } )
             }
             else{
-                console.log(`Error: todo #${ind} does not exist.Nothing deleted.`)
+                console.log(`Error: todo #${ind} does not exist. Nothing deleted.`)
             }
         })
         
@@ -102,51 +105,51 @@ function done(ind){
 }
 
 function readtodo(){
-    
-    fs.readFile( todopath, (error, data) => {
-        let pendingcg =0
-        if(error) pendingcg =0
-        else{
-            var arr = data.toString().split("\n")
-            arr.forEach((ele) => {
-                if(ele){
-                    pendingcg = pendingcg +1 
-                }
-            }) 
+    let data = fs.readFileSync( todopath)
+    let pendingcg =0
+    var arr = data.toString().split("\n")
+    arr.forEach((ele) => {
+        if(ele){
+            pendingcg = pendingcg +1
         }
-        return pendingcg
     })
- }
+    return pendingcg
+}
 
 function readdone(){
-    let donecg = 0
-    fs.readFile(donepath, (error, data) => {
-        if(error) donecg =0 
-        else{
-            var arr = data.toString().split("\n")
-            arr.forEach((ele) => {
-                if(ele){
-                    donecg ++
-                } 
-            })
+    let donecg=0
+    let data = fs.readFileSync(donepath)
+    var arr = data.toString().split("\n")
+    arr.forEach((ele) => {
+        if(ele){
+            donecg ++
         }
     })
- }
+    return donecg
+}
 
-
-async function report(){
+function report(){
     let date = new Date()
-    newdate=date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
-    var pendingcg=0
-    var donecg=0
-    try {
-         pendingcg = await readtodo()
-         donecg = await readdone()
-        console.log(`${newdate} Pending:${pendingcg} Completed: ${donecg}`)
-
-    } 
+    let month = date.getMonth()+1
+    newdate=date.getDate()+"/"+month+"/"+date.getFullYear()
+    let pendingcg =0
+    let donecg =0
     
-    catch(err) {
+    try {
+        if (fs.existsSync(todopath)) {
+            pendingcg=readtodo()
+        }
+        else{
+            pendingcg=0
+        }
+        if (fs.existsSync(donepath)) {
+            donecg=readdone()
+        }
+        else{
+            donecg=0
+        }
+        console.log(`${newdate} Pending:${pendingcg} Completed: ${donecg}`) 
+    } catch(err) {
         console.error(err)
     }
 }
@@ -162,7 +165,7 @@ $ ./todo help             # Show usage
 $ ./todo report           # Statistics`;
     
 
-console.log(usage.toString())
+process.stdout.write(usage.toString())
 
 }
 

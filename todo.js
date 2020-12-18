@@ -9,10 +9,17 @@ program
     .action(()=>helps())
 
 program
-    .command('add <item>')
+    .command('add [item]')
     .alias('a')
     .description('adds item to list')
-    .action(item => add(item))
+    .action(item => {
+        if(!item){
+            console.log("Error: Missing todo string. Nothing added!")
+        }
+        else{
+            add(item)
+        }
+    })
 
 program
     .command('ls')
@@ -20,14 +27,28 @@ program
     .action(()=>ls())
 
 program
-    .command('del <index>')
+    .command('del [index]')
     .description('Use the del command to remove a todo item by its number.')
-    .action( ind => del(ind))
+    .action( ind =>{
+        if(!ind){
+            console.log('Error: Missing NUMBER for deleting todo.')
+        }
+        else{
+            del(ind)
+        }
+    })
 
 program
-    .command('done <index>')
+    .command('done [index]')
     .description('marks as done')
-    .action( ind => done(ind))
+    .action( ind => {
+        if(!ind){
+            console.log(`Error: Missing NUMBER for marking todo as done.`)
+        }
+        else{
+            done(ind)
+        }
+    })
 
 program
     .command('report')
