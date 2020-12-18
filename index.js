@@ -165,7 +165,7 @@ $ ./todo help             # Show usage
 $ ./todo report           # Statistics`;
     
 
-process.stdout.write(usage.toString())
+console.log(usage)
 
 }
 
